@@ -1,0 +1,16 @@
+14:32:29.053 Running build in Washington, D.C., USA (East) – iad1
+14:32:29.054 Build machine configuration: 2 cores, 8 GB
+14:32:29.170 Cloning github.com/miayeah-gigabyte/mia-workout (Branch: main, Commit: ac3d3dc)
+14:32:29.171 Previous build caches not available.
+14:32:29.369 Cloning completed: 199.000ms
+14:32:29.713 Running "vercel build"
+14:32:30.116 Vercel CLI 49.0.0
+14:32:31.328 npm error code ENOENT
+14:32:31.329 npm error syscall open
+14:32:31.329 npm error path /vercel/path0/client/package.json
+14:32:31.329 npm error errno -2
+14:32:31.330 npm error enoent Could not read package.json: Error: ENOENT: no such file or directory, open '/vercel/path0/client/package.json'
+14:32:31.331 npm error enoent This is related to npm not being able to find a file.
+14:32:31.331 npm error enoent
+14:32:31.333 npm error A complete log of this run can be found in: /vercel/.npm/_logs/2025-12-07T20_32_30_952Z-debug-0.log
+14:32:31.358 Error: Command "npm run build" exited with 254
