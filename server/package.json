@@ -1,0 +1,19 @@
+{
+  "name": "mia-workout-api",
+  "version": "1.0.0",
+  "description": "Simplified Workout Tracker API for MiaJourney.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.x.x",
+    "cors": "^2.8.5",
+    "date-fns": "^3.x.x",
+    "express": "^4.19.2",
+    "nodemailer": "^6.9.14"
+  },
+  "devDependencies": {
+    "prisma": "^5.x.x"
+  }
+}
