@@ -1,0 +1,52 @@
+// server/prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User (Mia and Partner)
+model User {
+  id             String         @id @default(uuid())
+  email          String         @unique
+  name           String         @default("Mia")
+  partnerEmail   String?        // For Karol's email
+  
+  sessions       Session[]
+  unlocks        RewardUnlock[]
+  
+  createdAt      DateTime       @default(now())
+  @@map("User") 
+}
+
+// Workout Sessions (The Activity Log)
+model Session {
+  id             String   @id @default(uuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id])
+  
+  date           DateTime @default(now())
+  minutes        Int      @default(30) // Default to 30 min as required
+  notes          String?
+  
+  createdAt      DateTime @default(now())
+  @@map("Session")
+}
+
+// Rewards (Tracks when a reward is successfully unlocked)
+model RewardUnlock {
+  id             String     @id @default(uuid())
+  userId         String
+  user           User       @relation(fields: [userId], references: [id])
+  
+  // Store the name of the reward unlocked
+  rewardName     String     
+  
+  unlockedAt     DateTime   @default(now())
+  
+  @@map("RewardUnlock")
+}
