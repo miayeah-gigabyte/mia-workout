@@ -6,26 +6,31 @@ const prisma = new PrismaClient(); // Initialize Prisma Client
 // 1. POST /api/sessions
 const createSession = async (req, res) => {
   try {
-    const { date, durationMinutes, type, rewardValue } = req.body;
+    // FIX 1: Changed 'durationMinutes' to 'minutes' (Schema field)
+    // FIX 2: Changed 'rewardValue' to 'pointsValue' (Schema field)
+    // FIX 3: Added 'userId' as a required field
+    const { date, minutes, pointsValue, userId, type } = req.body;
 
-    // Basic data validation (you may need more comprehensive validation)
-    if (!date || !durationMinutes) {
-      return res.status(400).json({ error: 'Missing required session data.' });
+    // Basic data validation
+    if (!userId || !minutes || !date) {
+      return res.status(400).json({ error: 'Missing required session data (userId, minutes, or date).' });
     }
 
-    const newSession = await prisma.session.create({
+    // FIX 4: Ensured model name is capitalized (prisma.Session)
+    const newSession = await prisma.Session.create({
       data: {
+        userId, // Required field from schema
         date: new Date(date),
-        durationMinutes: parseInt(durationMinutes, 10),
-        type, // Ensure your schema supports this field
-        rewardValue: parseFloat(rewardValue) || 0, // Default to 0 if null
-        // Add any required userId field if your schema links to a user
+        minutes: parseInt(minutes, 10), // Use 'minutes'
+        pointsValue: parseFloat(pointsValue) || 0, // Use 'pointsValue'
+        // 'type' is not in your schema but keeping it for now if needed elsewhere
       },
     });
 
     res.status(201).json(newSession);
   } catch (error) {
     console.error("Error creating session:", error);
+    // Log the detailed error to your Render console
     res.status(500).json({ error: 'Failed to create session.', details: error.message });
   }
 };
@@ -33,10 +38,12 @@ const createSession = async (req, res) => {
 // 2. GET /api/sessions
 const getSessions = async (req, res) => {
   try {
-    const sessions = await prisma.session.findMany({
+    // FIX 4: Ensured model name is capitalized (prisma.Session)
+    const sessions = await prisma.Session.findMany({
       orderBy: {
         date: 'desc',
       },
+      // You may need to filter by a specific userId here later
     });
     res.status(200).json(sessions);
   } catch (error) {
@@ -48,17 +55,17 @@ const getSessions = async (req, res) => {
 // 3. GET /api/sessions/dashboard
 const getDashboardMetrics = async (req, res) => {
   try {
-    // Example: Calculate total sessions and total rewards
-    const totalSessions = await prisma.session.count();
-    const totalRewards = await prisma.session.aggregate({
+    // FIX 4: Ensured model name is capitalized (prisma.Session)
+    const totalSessions = await prisma.Session.count();
+    const totalRewards = await prisma.Session.aggregate({
       _sum: {
-        rewardValue: true,
+        pointsValue: true, // FIX: Use 'pointsValue' from schema
       },
     });
 
     res.status(200).json({
       totalSessions: totalSessions,
-      totalRewards: totalRewards._sum.rewardValue || 0,
+      totalRewards: totalRewards._sum.pointsValue || 0, // Use 'pointsValue'
     });
   } catch (error) {
     console.error("Error fetching dashboard metrics:", error);
@@ -70,10 +77,10 @@ const getDashboardMetrics = async (req, res) => {
 const deleteSession = async (req, res) => {
   const { id } = req.params;
   try {
-    // Check if the session exists before deleting (optional, but good practice)
-    const deletedSession = await prisma.session.delete({
+    // FIX: IDs are Strings (UUIDs) in the schema, not Integers. Removed parseInt.
+    const deletedSession = await prisma.Session.delete({
       where: {
-        id: parseInt(id, 10), // Assuming your session ID is an integer
+        id: id,
       },
     });
     res.status(200).json({ message: 'Session deleted successfully', session: deletedSession });
@@ -88,7 +95,6 @@ const deleteSession = async (req, res) => {
 
 
 // --- CRITICAL EXPORT STATEMENT ---
-// This ensures that all functions are available for import in index.js
 module.exports = {
   createSession,
   getSessions,
