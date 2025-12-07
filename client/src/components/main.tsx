@@ -2,10 +2,8 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-// CRITICAL FIX: Changed the import path from './App.tsx' to '../App.tsx' 
-// to correctly locate the App.tsx file in the parent directory (src/).
-import App from '../App'; 
-import './index.css'; // Assuming your global styles are here
+import App from '../App'; // Path fixed
+import '../index.css'; // Path fixed
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
