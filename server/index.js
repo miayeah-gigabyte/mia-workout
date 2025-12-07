@@ -2,44 +2,40 @@
 
 const express = require('express');
 const cors = require('cors');
-const { PrismaClient } = require('@prisma/client');
 const sessionController = require('./controllers/sessionController');
 
 const app = express();
-const PORT = process.env.PORT || 3001;
 
-// Initialize Prisma Client
-const prisma = new PrismaClient();
+// --- CRITICAL CORS CONFIGURATION ---
 
-// Middleware
-app.use(cors()); 
-app.use(express.json());
+// FIX: Removed process.env usage and removed the trailing slash.
+const VERCEL_FRONTEND_URL = 'https://mia-workout-pkvr.vercel.app'; 
 
-// --- ROUTES ---
+app.use(cors({
+  origin: VERCEL_FRONTEND_URL,
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
+}));
 
-// 1. User Setup (Should be called once to create Mia's User record)
-app.get('/api/setup', sessionController.setupUser); 
+app.use(express.json()); // Middleware to parse JSON body requests
 
-// 2. Log Session (POST)
-app.post('/api/sessions', sessionController.logSession);
+// --- API Routes ---
 
-// 3. Get Sessions/Dashboard Data (GET)
+// 1. Root/Status Check Route
+app.get('/', (req, res) => {
+  res.status(200).send('MiaJourney Workout API is operational.');
+});
+
+// 2. Session Routes
+app.post('/api/sessions', sessionController.createSession);
 app.get('/api/sessions', sessionController.getSessions);
+app.get('/api/sessions/dashboard', sessionController.getDashboardMetrics);
+app.delete('/api/sessions/:id', sessionController.deleteSession);
 
+// --- Server Start ---
 
-// --- START SERVER ---
-async function startServer() {
-  try {
-    await prisma.$connect();
-    console.log("Database connected successfully.");
+const PORT = process.env.PORT || 5000;
 
-    app.listen(PORT, () => {
-      console.log(`Server listening on port ${PORT}`);
-    });
-  } catch (error) {
-    console.error("Server failed to start:", error);
-    process.exit(1);
-  }
-}
-
-startServer();
+app.listen(PORT, () => {
+  console.log(`Server is listening on port ${PORT}`);
+});
